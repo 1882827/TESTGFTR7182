@@ -15,71 +15,61 @@ local killsShown = false
 local killsGui = nil
 
 local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
-    killsShown = not killsShown
+	killsShown = not killsShown
 
-    if killsShown then
-        if not killsGui then
-            killsGui = Instance.new("ScreenGui")
-            killsGui.Name = "KillsGui"
-            killsGui.ResetOnSpawn = false
-            killsGui.Enabled = true
-            killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	if killsShown then
+		if not killsGui then
+			killsGui = Instance.new("ScreenGui")
+			killsGui.Name = "KillsGui"
+			killsGui.ResetOnSpawn = false
+			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-            local killsFrame = Instance.new("Frame")
-            killsFrame.Size = UDim2.new(0, 140, 0, 60) -- menor
-            killsFrame.Position = UDim2.new(0.5, -70, 0.3, 0)
-            killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
-            killsFrame.BorderSizePixel = 2
-            killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            killsFrame.Active = true
-            killsFrame.Draggable = true
-            killsFrame.Parent = killsGui
+			local titleLabel = Instance.new("TextLabel")
+			titleLabel.Size = UDim2.new(0, 200, 0, 40)
+			titleLabel.Position = UDim2.new(0.5, -100, 0, 10)
+			titleLabel.BackgroundTransparency = 1
+			titleLabel.Text = "Project V1"
+			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			titleLabel.Font = Enum.Font.SourceSansBold
+			titleLabel.TextScaled = true
+			titleLabel.Parent = killsGui
 
-            local title = Instance.new("TextLabel")
-            title.Size = UDim2.new(1, 0, 0.35, 0)
-            title.BackgroundTransparency = 1
-            title.Text = "Project V1"
-            title.TextColor3 = Color3.fromRGB(255, 255, 255)
-            title.Font = Enum.Font.GothamBold
-            title.TextScaled = true
-            title.Parent = killsFrame
+			local killsFrame = Instance.new("Frame")
+			killsFrame.Size = UDim2.new(0, 180, 0, 50)
+			killsFrame.Position = UDim2.new(0.5, -90, 0, 60)
+			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139) -- azul escuro
+			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0) -- borda preta
+			killsFrame.Active = true
+			killsFrame.Draggable = true
+			killsFrame.Parent = killsGui
 
-            local killsText = Instance.new("TextLabel")
-            killsText.Size = UDim2.new(0.5, 0, 0.35, 0)
-            killsText.Position = UDim2.new(0, 0, 0.35, 0)
-            killsText.BackgroundTransparency = 1
-            killsText.Text = "Kills:"
-            killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
-            killsText.Font = Enum.Font.GothamBold
-            killsText.TextScaled = true
-            killsText.Parent = killsFrame
+			local killsLabel = Instance.new("TextLabel")
+			killsLabel.Size = UDim2.new(1, 0, 1, 0)
+			killsLabel.BackgroundTransparency = 1
+			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			killsLabel.TextScaled = true
+			killsLabel.Font = Enum.Font.SourceSansBold
+			killsLabel.Parent = killsFrame
 
-            local killsLabel = Instance.new("TextLabel")
-            killsLabel.Size = UDim2.new(0.5, 0, 0.35, 0)
-            killsLabel.Position = UDim2.new(0.5, 0, 0.35, 0)
-            killsLabel.BackgroundTransparency = 1
-            killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            killsLabel.Font = Enum.Font.GothamBold
-            killsLabel.TextScaled = true
-            killsLabel.Parent = killsFrame
-
-            coroutine.wrap(function()
-                while killsGui and killsGui.Parent do
-                    local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-                    if kills then
-                        killsLabel.Text = tostring(kills.Value)
-                    end
-                    task.wait(0.2)
-                end
-            end)()
-        else
-            killsGui.Enabled = true
-        end
-    else
-        if killsGui then
-            killsGui.Enabled = false
-        end
-    end
+			coroutine.wrap(function()
+				while killsGui and killsGui.Parent do
+					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
+					if kills then
+						killsLabel.Text = "Kills: " .. tostring(kills.Value)
+					else
+						killsLabel.Text = "Kills: 0"
+					end
+					task.wait(0.2)
+				end
+			end)()
+		else
+			killsGui.Enabled = true
+		end
+	else
+		if killsGui then
+			killsGui.Enabled = false
+		end
+	end
 end)
 
 showKillsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
