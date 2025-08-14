@@ -10,6 +10,7 @@ local tabPlayer = window:AddTab("Player")
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 
 local killsShown = false
 local killsGui = nil
@@ -35,10 +36,10 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			titleLabel.Parent = killsGui
 
 			local killsFrame = Instance.new("Frame")
-			killsFrame.Size = UDim2.new(0, 300, 0, 100)
-			killsFrame.Position = UDim2.new(0.5, -150, 0.3, 0)
+			killsFrame.Size = UDim2.new(0, 250, 0, 80)
+			killsFrame.Position = UDim2.new(0.5, -125, 0.3, 0)
 			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
-			killsFrame.BorderSizePixel = 4
+			killsFrame.BorderSizePixel = 2
 			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			killsFrame.Parent = killsGui
 
@@ -60,6 +61,34 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsLabel.Font = Enum.Font.GothamBold
 			killsLabel.TextScaled = true
 			killsLabel.Parent = killsFrame
+
+			-- Sistema para mover a UI
+			local dragging = false
+			local dragStart, startPos
+
+			local function update(input)
+				local delta = input.Position - dragStart
+				killsFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			end
+
+			killsFrame.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+					dragging = true
+					dragStart = input.Position
+					startPos = killsFrame.Position
+					input.Changed:Connect(function()
+						if input.UserInputState == Enum.UserInputState.End then
+							dragging = false
+						end
+					end)
+				end
+			end)
+
+			UserInputService.InputChanged:Connect(function(input)
+				if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+					update(input)
+				end
+			end)
 
 			coroutine.wrap(function()
 				while killsGui and killsGui.Parent do
