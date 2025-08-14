@@ -16,97 +16,92 @@ local killsShown = false
 local killsGui = nil
 
 local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
-	killsShown = not killsShown
+    killsShown = not killsShown
 
-	if killsShown then
-		if not killsGui then
-			killsGui = Instance.new("ScreenGui")
-			killsGui.Name = "KillsGui"
-			killsGui.ResetOnSpawn = false
-			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    if killsShown then
+        if not killsGui then
+            killsGui = Instance.new("ScreenGui")
+            killsGui.Name = "KillsGui"
+            killsGui.ResetOnSpawn = false
+            killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-			local titleLabel = Instance.new("TextLabel")
-			titleLabel.Size = UDim2.new(1, 0, 0, 30)
-			titleLabel.Position = UDim2.new(0, 0, 0, 0)
-			titleLabel.BackgroundTransparency = 1
-			titleLabel.Text = "Project V1"
-			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			titleLabel.Font = Enum.Font.GothamBold
-			titleLabel.TextScaled = true
-			titleLabel.Parent = killsGui
+            local killsFrame = Instance.new("Frame")
+            killsFrame.Size = UDim2.new(0, 180, 0, 55) -- tamanho reduzido
+            killsFrame.Position = UDim2.new(0.5, -90, 0.3, 0) -- centralizado
+            killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
+            killsFrame.BorderSizePixel = 2
+            killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            killsFrame.Active = true
+            killsFrame.Selectable = true
+            killsFrame.Parent = killsGui
 
-			local killsFrame = Instance.new("Frame")
-			killsFrame.Size = UDim2.new(0, 250, 0, 80)
-			killsFrame.Position = UDim2.new(0.5, -125, 0.3, 0)
-			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
-			killsFrame.BorderSizePixel = 2
-			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			killsFrame.Parent = killsGui
+            local killsText = Instance.new("TextLabel")
+            killsText.Size = UDim2.new(1, 0, 0.5, 0)
+            killsText.Position = UDim2.new(0, 0, 0, 0)
+            killsText.BackgroundTransparency = 1
+            killsText.Text = "Kills:"
+            killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
+            killsText.Font = Enum.Font.GothamBold
+            killsText.TextScaled = true
+            killsText.Parent = killsFrame
 
-			local killsText = Instance.new("TextLabel")
-			killsText.Size = UDim2.new(1, 0, 0.5, 0)
-			killsText.Position = UDim2.new(0, 0, 0, 0)
-			killsText.BackgroundTransparency = 1
-			killsText.Text = "Kills:"
-			killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
-			killsText.Font = Enum.Font.GothamBold
-			killsText.TextScaled = true
-			killsText.Parent = killsFrame
+            local killsLabel = Instance.new("TextLabel")
+            killsLabel.Size = UDim2.new(1, 0, 0.5, 0)
+            killsLabel.Position = UDim2.new(0, 0, 0.5, 0)
+            killsLabel.BackgroundTransparency = 1
+            killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            killsLabel.Font = Enum.Font.GothamBold
+            killsLabel.TextScaled = true
+            killsLabel.Parent = killsFrame
 
-			local killsLabel = Instance.new("TextLabel")
-			killsLabel.Size = UDim2.new(1, 0, 0.5, 0)
-			killsLabel.Position = UDim2.new(0, 0, 0.5, 0)
-			killsLabel.BackgroundTransparency = 1
-			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			killsLabel.Font = Enum.Font.GothamBold
-			killsLabel.TextScaled = true
-			killsLabel.Parent = killsFrame
+            -- Sistema de mover
+            local dragging = false
+            local dragStart, startPos
 
-			-- Sistema para mover a UI
-			local dragging = false
-			local dragStart, startPos
+            local function update(input)
+                local delta = input.Position - dragStart
+                killsFrame.Position = UDim2.new(
+                    startPos.X.Scale, startPos.X.Offset + delta.X,
+                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                )
+            end
 
-			local function update(input)
-				local delta = input.Position - dragStart
-				killsFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-			end
+            killsFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    dragStart = input.Position
+                    startPos = killsFrame.Position
+                    input.Changed:Connect(function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            dragging = false
+                        end
+                    end)
+                end
+            end)
 
-			killsFrame.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 then
-					dragging = true
-					dragStart = input.Position
-					startPos = killsFrame.Position
-					input.Changed:Connect(function()
-						if input.UserInputState == Enum.UserInputState.End then
-							dragging = false
-						end
-					end)
-				end
-			end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    update(input)
+                end
+            end)
 
-			UserInputService.InputChanged:Connect(function(input)
-				if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-					update(input)
-				end
-			end)
-
-			coroutine.wrap(function()
-				while killsGui and killsGui.Parent do
-					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-					if kills then
-						killsLabel.Text = tostring(kills.Value)
-					end
-					task.wait(0.2)
-				end
-			end)()
-		else
-			killsGui.Enabled = true
-		end
-	else
-		if killsGui then
-			killsGui.Enabled = false
-		end
-	end
+            coroutine.wrap(function()
+                while killsGui and killsGui.Parent do
+                    local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
+                    if kills then
+                        killsLabel.Text = tostring(kills.Value)
+                    end
+                    task.wait(0.2)
+                end
+            end)()
+        else
+            killsGui.Enabled = true
+        end
+    else
+        if killsGui then
+            killsGui.Enabled = false
+        end
+    end
 end)
 
 showKillsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
