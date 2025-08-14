@@ -24,20 +24,20 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsGui.ResetOnSpawn = false
 			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-			-- Frame principal (180x55) com borda preta
+			-- Frame principal (180x55)
 			local killsFrame = Instance.new("Frame")
-			killsFrame.Size = UDim2.new(0, 220, 0, 100) -- aumentei para ficar parecido com sua imagem
-			killsFrame.Position = UDim2.new(0.5, -110, 0, 60)
-			killsFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- vermelho
-			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0) -- borda preta
+			killsFrame.Size = UDim2.new(0, 180, 0, 55)
+			killsFrame.Position = UDim2.new(0.5, -90, 0, 60)
+			killsFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			killsFrame.Active = true
 			killsFrame.Draggable = true
 			killsFrame.Parent = killsGui
 
-			-- Label "Project V1" dentro do frame (parte superior)
+			-- Label "Project V1" no topo do frame
 			local titleLabel = Instance.new("TextLabel")
-			titleLabel.Size = UDim2.new(1, 0, 0, 30)
-			titleLabel.Position = UDim2.new(0, 0, 0, -30) -- acima do frame, mas preso a ele
+			titleLabel.Size = UDim2.new(1, 0, 0, 20)
+			titleLabel.Position = UDim2.new(0, 0, 0, 0)
 			titleLabel.BackgroundTransparency = 1
 			titleLabel.Text = "Project V1"
 			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -47,7 +47,8 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 
 			-- Label para exibir kills
 			local killsLabel = Instance.new("TextLabel")
-			killsLabel.Size = UDim2.new(1, 0, 1, 0)
+			killsLabel.Size = UDim2.new(1, 0, 0, 35)
+			killsLabel.Position = UDim2.new(0, 0, 0, 20) -- abaixo do título
 			killsLabel.BackgroundTransparency = 1
 			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			killsLabel.TextScaled = true
@@ -59,9 +60,9 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 				while killsGui and killsGui.Parent do
 					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
 					if kills then
-						killsLabel.Text = "Kills:\n" .. tostring(kills.Value)
+						killsLabel.Text = "Kills: " .. tostring(kills.Value)
 					else
-						killsLabel.Text = "Kills:\n0"
+						killsLabel.Text = "Kills: 0"
 					end
 					task.wait(0.2)
 				end
