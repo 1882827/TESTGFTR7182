@@ -9,77 +9,101 @@ local window = library:AddWindow("Silence | Boost Gifter", {
 local tabPlayer = window:AddTab("Player")
 
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
-local killsShown = false
-local killsGui = nil
+-- Cria a ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
-    killsShown = not killsShown
+-- Frame principal
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 100)
+frame.Position = UDim2.new(0.5, -125, 0.1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 139) -- Azul escuro
+frame.BorderSizePixel = 2
+frame.Parent = screenGui
 
-    if killsShown then
-        if not killsGui then
-            killsGui = Instance.new("ScreenGui")
-            killsGui.Name = "KillsGui"
-            killsGui.ResetOnSpawn = false
-            killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+-- Título "Project V1"
+local title = Instance.new("TextLabel")
+title.Text = "Project V1"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, 0, 0.33, 0)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Parent = frame
 
-            local killsFrame = Instance.new("Frame")
-            killsFrame.Size = UDim2.new(0, 180, 0, 80)
-            killsFrame.Position = UDim2.new(0.5, -90, 0.3, 0)
-            killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
-            killsFrame.BorderSizePixel = 2
-            killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            killsFrame.Active = true
-            killsFrame.Draggable = true -- Arrasto simples do Roblox
-            killsFrame.Parent = killsGui
+-- Texto "Kills:"
+local killsText = Instance.new("TextLabel")
+killsText.Text = "Kills:"
+killsText.Font = Enum.Font.GothamBold
+killsText.TextSize = 26
+killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
+killsText.BackgroundTransparency = 1
+killsText.Size = UDim2.new(1, 0, 0.33, 0)
+killsText.Position = UDim2.new(0, 0, 0.33, 0)
+killsText.Parent = frame
 
-            local title = Instance.new("TextLabel")
-            title.Size = UDim2.new(1, 0, 0.3, 0)
-            title.Position = UDim2.new(0, 0, 0, 0)
-            title.BackgroundTransparency = 1
-            title.Text = "Project V1"
-            title.TextColor3 = Color3.fromRGB(255, 255, 255)
-            title.Font = Enum.Font.GothamBold
-            title.TextScaled = true
-            title.Parent = killsFrame
+-- Texto do número de kills
+local killsNumber = Instance.new("TextLabel")
+killsNumber.Font = Enum.Font.GothamBold
+killsNumber.TextSize = 26
+killsNumber.TextColor3 = Color3.fromRGB(255, 255, 255)
+killsNumber.BackgroundTransparency = 1
+killsNumber.Size = UDim2.new(1, 0, 0.33, 0)
+killsNumber.Position = UDim2.new(0, 0, 0.66, 0)
+killsNumber.Parent = frame
 
-            local killsText = Instance.new("TextLabel")
-            killsText.Size = UDim2.new(0.5, 0, 0.35, 0)
-            killsText.Position = UDim2.new(0, 0, 0.3, 0)
-            killsText.BackgroundTransparency = 1
-            killsText.Text = "Kills:"
-            killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
-            killsText.Font = Enum.Font.GothamBold
-            killsText.TextScaled = true
-            killsText.Parent = killsFrame
+-- Atualizar kills em tempo real
+local leaderstats = LocalPlayer:WaitForChild("leaderstats")
+local killsStat = leaderstats:WaitForChild("Kills")
 
-            local killsLabel = Instance.new("TextLabel")
-            killsLabel.Size = UDim2.new(0.5, 0, 0.35, 0)
-            killsLabel.Position = UDim2.new(0.5, 0, 0.3, 0)
-            killsLabel.BackgroundTransparency = 1
-            killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            killsLabel.Font = Enum.Font.GothamBold
-            killsLabel.TextScaled = true
-            killsLabel.Parent = killsFrame
+local function updateKills()
+    killsNumber.Text = tostring(killsStat.Value)
+end
 
-            coroutine.wrap(function()
-                while killsGui and killsGui.Parent do
-                    local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-                    if kills then
-                        killsLabel.Text = tostring(kills.Value)
-                    end
-                    task.wait(0.2)
-                end
-            end)()
-        else
-            killsGui.Enabled = true
-        end
-    else
-        if killsGui then
-            killsGui.Enabled = false
-        end
+killsStat:GetPropertyChangedSignal("Value"):Connect(updateKills)
+updateKills()
+
+-- Sistema de arrastar
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                               startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
     end
 end)
 
-showKillsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or 
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateDrag(input)
+    end
+end)
