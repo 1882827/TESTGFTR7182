@@ -6,134 +6,78 @@ local window = library:AddWindow("Silence | Boost Gifter", {
     can_resize = false,
 })
 
-local GifterTab = window:AddTab("Gifter")
-
-GifterTab:AddLabel("Egg Gifter").TextSize = 20
-
-GifterTab:AddLabel("Get on a machine for less Lag").TextSize = 17
-
-local proteinEggLabel = GifterTab:AddLabel("Protein Eggs: 0")
-proteinEggLabel.TextSize = 18
+local tabPlayer = window:AddTab("Player")
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
 
+local killsShown = false
+local killsGui = nil
 
-local selectedPlayer = nil
-local eggCount = 0
+local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
+	killsShown = not killsShown
 
-local playerDropdown = GifterTab:AddDropdown("Choose Player", function(name)
-    selectedPlayer = Players:FindFirstChild(name)
+	if killsShown then
+		if not killsGui then
+			killsGui = Instance.new("ScreenGui")
+			killsGui.Name = "KillsGui"
+			killsGui.ResetOnSpawn = false
+			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+			local titleLabel = Instance.new("TextLabel")
+			titleLabel.Size = UDim2.new(1, 0, 0, 30)
+			titleLabel.Position = UDim2.new(0, 0, 0, 0)
+			titleLabel.BackgroundTransparency = 1
+			titleLabel.Text = "Project V1"
+			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			titleLabel.Font = Enum.Font.GothamBold
+			titleLabel.TextScaled = true
+			titleLabel.Parent = killsGui
+
+			local killsFrame = Instance.new("Frame")
+			killsFrame.Size = UDim2.new(0, 300, 0, 100)
+			killsFrame.Position = UDim2.new(0.5, -150, 0.3, 0)
+			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
+			killsFrame.BorderSizePixel = 4
+			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			killsFrame.Parent = killsGui
+
+			local killsText = Instance.new("TextLabel")
+			killsText.Size = UDim2.new(1, 0, 0.5, 0)
+			killsText.Position = UDim2.new(0, 0, 0, 0)
+			killsText.BackgroundTransparency = 1
+			killsText.Text = "Kills:"
+			killsText.TextColor3 = Color3.fromRGB(255, 255, 255)
+			killsText.Font = Enum.Font.GothamBold
+			killsText.TextScaled = true
+			killsText.Parent = killsFrame
+
+			local killsLabel = Instance.new("TextLabel")
+			killsLabel.Size = UDim2.new(1, 0, 0.5, 0)
+			killsLabel.Position = UDim2.new(0, 0, 0.5, 0)
+			killsLabel.BackgroundTransparency = 1
+			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			killsLabel.Font = Enum.Font.GothamBold
+			killsLabel.TextScaled = true
+			killsLabel.Parent = killsFrame
+
+			coroutine.wrap(function()
+				while killsGui and killsGui.Parent do
+					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
+					if kills then
+						killsLabel.Text = tostring(kills.Value)
+					end
+					task.wait(0.2)
+				end
+			end)()
+		else
+			killsGui.Enabled = true
+		end
+	else
+		if killsGui then
+			killsGui.Enabled = false
+		end
+	end
 end)
 
-for _, player in ipairs(Players:GetPlayers()) do
-    if player ~= Players.LocalPlayer then
-        playerDropdown:Add(player.Name)
-    end
-end
-
-Players.PlayerAdded:Connect(function(player)
-    if player ~= Players.LocalPlayer then
-        playerDropdown:Add(player.Name)
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(player)
-    playerDropdown:Remove(player.Name)
-    if selectedPlayer == player then
-        selectedPlayer = nil
-    end
-end)
-
-GifterTab:AddTextBox("Amount", function(Text)
-    eggCount = tonumber(Text)
-end)
-
-GifterTab:AddButton("Start Gifting", function()
-    if selectedPlayer and eggCount and eggCount > 0 then
-        for i = 1, eggCount do
-            local args = {
-                [1] = "giftRequest",
-                [2] = selectedPlayer,
-                [3] = Players.LocalPlayer.consumablesFolder:FindFirstChild("Protein Egg")
-            }
-
-            ReplicatedStorage.rEvents.giftRemote:InvokeServer(unpack(args))
-        end
-    end
-end)
-
-GifterTab:AddLabel("Shake Gifter").TextSize = 20
-
-local tropicalShakeLabel = GifterTab:AddLabel("Tropical Shakes: 0")
-tropicalShakeLabel.TextSize = 18
-
-local function updateItemCount()
-    local proteinEggCount = 0
-    local tropicalShakeCount = 0
-
-    local backpack = Players.LocalPlayer:WaitForChild("Backpack")
-    if backpack then
-        for _, item in ipairs(backpack:GetChildren()) do
-            if item.Name == "Protein Egg" then
-                proteinEggCount = proteinEggCount + 1
-            elseif item.Name == "Tropical Shake" then
-                tropicalShakeCount = tropicalShakeCount + 1
-            end
-        end
-    end
-
-    proteinEggLabel.Text = "Protein Eggs: " .. proteinEggCount
-    tropicalShakeLabel.Text = "Tropical Shakes: " .. tropicalShakeCount
-end
-
-task.spawn(function()
-    while true do
-        updateItemCount()
-        task.wait(7.5)
-    end
-end)
-
-local selectedPlayer = nil
-local shakeCount = 0
-
-local playerDropdown = GifterTab:AddDropdown("Choose Player", function(name)
-    selectedPlayer = Players:FindFirstChild(name)
-end)
-
-for _, player in ipairs(Players:GetPlayers()) do
-    if player ~= Players.LocalPlayer then
-        playerDropdown:Add(player.Name)
-    end
-end
-
-Players.PlayerAdded:Connect(function(player)
-    if player ~= Players.LocalPlayer then
-        playerDropdown:Add(player.Name)
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(player)
-    playerDropdown:Remove(player.Name)
-    if selectedPlayer == player then
-        selectedPlayer = nil
-    end
-end)
-
-GifterTab:AddTextBox("Amount", function(Text)
-    shakeCount = tonumber(Text)
-end)
-
-GifterTab:AddButton("Start Gifting", function()
-    if selectedPlayer and shakeCount and shakeCount > 0 then
-        for i = 1, shakeCount do
-            local args = {
-                [1] = "giftRequest",
-                [2] = selectedPlayer,
-                [3] = Players.LocalPlayer.consumablesFolder:FindFirstChild("Tropical Shake")
-            }
-
-            ReplicatedStorage.rEvents.giftRemote:InvokeServer(unpack(args))
-        end
-    end
-end)
+showKillsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
