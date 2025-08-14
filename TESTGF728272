@@ -24,7 +24,6 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsGui.ResetOnSpawn = false
 			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-			-- Frame principal (180x55)
 			local killsFrame = Instance.new("Frame")
 			killsFrame.Size = UDim2.new(0, 180, 0, 55)
 			killsFrame.Position = UDim2.new(0.5, -90, 0, 60)
@@ -34,7 +33,6 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsFrame.Draggable = true
 			killsFrame.Parent = killsGui
 
-			-- Label "Project V1" no topo do frame
 			local titleLabel = Instance.new("TextLabel")
 			titleLabel.Size = UDim2.new(1, 0, 0, 20)
 			titleLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -45,17 +43,15 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			titleLabel.TextScaled = true
 			titleLabel.Parent = killsFrame
 
-			-- Label para exibir kills
 			local killsLabel = Instance.new("TextLabel")
 			killsLabel.Size = UDim2.new(1, 0, 0, 35)
-			killsLabel.Position = UDim2.new(0, 0, 0, 20) -- abaixo do título
+			killsLabel.Position = UDim2.new(0, 0, 0, 20)
 			killsLabel.BackgroundTransparency = 1
 			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			killsLabel.TextScaled = true
 			killsLabel.Font = Enum.Font.SourceSansBold
 			killsLabel.Parent = killsFrame
 
-			-- Atualiza kills
 			coroutine.wrap(function()
 				while killsGui and killsGui.Parent do
 					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
