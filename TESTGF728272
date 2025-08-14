@@ -24,25 +24,28 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsGui.ResetOnSpawn = false
 			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-			local titleLabel = Instance.new("TextLabel")
-			titleLabel.Size = UDim2.new(0, 200, 0, 40)
-			titleLabel.Position = UDim2.new(0.5, -100, 0, 10)
-			titleLabel.BackgroundTransparency = 1
-			titleLabel.Text = "Project V1"
-			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			titleLabel.Font = Enum.Font.SourceSansBold
-			titleLabel.TextScaled = true
-			titleLabel.Parent = killsGui
-
+			-- Frame principal (180x55) com borda preta
 			local killsFrame = Instance.new("Frame")
-			killsFrame.Size = UDim2.new(0, 180, 0, 50)
-			killsFrame.Position = UDim2.new(0.5, -90, 0, 60)
-			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139) -- azul escuro
+			killsFrame.Size = UDim2.new(0, 220, 0, 100) -- aumentei para ficar parecido com sua imagem
+			killsFrame.Position = UDim2.new(0.5, -110, 0, 60)
+			killsFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- vermelho
 			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0) -- borda preta
 			killsFrame.Active = true
 			killsFrame.Draggable = true
 			killsFrame.Parent = killsGui
 
+			-- Label "Project V1" dentro do frame (parte superior)
+			local titleLabel = Instance.new("TextLabel")
+			titleLabel.Size = UDim2.new(1, 0, 0, 30)
+			titleLabel.Position = UDim2.new(0, 0, 0, -30) -- acima do frame, mas preso a ele
+			titleLabel.BackgroundTransparency = 1
+			titleLabel.Text = "Project V1"
+			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			titleLabel.Font = Enum.Font.SourceSansBold
+			titleLabel.TextScaled = true
+			titleLabel.Parent = killsFrame
+
+			-- Label para exibir kills
 			local killsLabel = Instance.new("TextLabel")
 			killsLabel.Size = UDim2.new(1, 0, 1, 0)
 			killsLabel.BackgroundTransparency = 1
@@ -51,13 +54,14 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
 			killsLabel.Font = Enum.Font.SourceSansBold
 			killsLabel.Parent = killsFrame
 
+			-- Atualiza kills
 			coroutine.wrap(function()
 				while killsGui and killsGui.Parent do
 					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
 					if kills then
-						killsLabel.Text = "Kills: " .. tostring(kills.Value)
+						killsLabel.Text = "Kills:\n" .. tostring(kills.Value)
 					else
-						killsLabel.Text = "Kills: 0"
+						killsLabel.Text = "Kills:\n0"
 					end
 					task.wait(0.2)
 				end
