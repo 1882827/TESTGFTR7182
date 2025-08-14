@@ -10,7 +10,6 @@ local tabPlayer = window:AddTab("Player")
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
 
 local killsShown = false
 local killsGui = nil
@@ -32,6 +31,7 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
             killsFrame.BorderSizePixel = 2
             killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
             killsFrame.Active = true
+            killsFrame.Draggable = true -- Arrasto simples do Roblox
             killsFrame.Parent = killsGui
 
             local title = Instance.new("TextLabel")
@@ -62,45 +62,6 @@ local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
             killsLabel.Font = Enum.Font.GothamBold
             killsLabel.TextScaled = true
             killsLabel.Parent = killsFrame
-
-            local dragging
-            local dragInput
-            local dragStart
-            local startPos
-
-            local function update(input)
-                local delta = input.Position - dragStart
-                killsFrame.Position = UDim2.new(
-                    startPos.X.Scale, startPos.X.Offset + delta.X,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
-                )
-            end
-
-            killsFrame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = true
-                    dragStart = input.Position
-                    startPos = killsFrame.Position
-
-                    input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            dragging = false
-                        end
-                    end)
-                end
-            end)
-
-            killsFrame.InputChanged:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                    dragInput = input
-                end
-            end)
-
-            UserInputService.InputChanged:Connect(function(input)
-                if dragging and input == dragInput then
-                    update(input)
-                end
-            end)
 
             coroutine.wrap(function()
                 while killsGui and killsGui.Parent do
