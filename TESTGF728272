@@ -8,69 +8,32 @@ local window = library:AddWindow("Silence | Boost Gifter", {
 
 local tabPlayer = window:AddTab("Player")
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = game.Players.LocalPlayer
 
-local killsShown = false
-local killsGui = nil
+local autoAllEnabled = false
+local sizeToSet = 0/0
 
-local showKillsButton = tabPlayer:AddButton("Show Kills Gui", function()
-	killsShown = not killsShown
-
-	if killsShown then
-		if not killsGui then
-			killsGui = Instance.new("ScreenGui")
-			killsGui.Name = "KillsGui"
-			killsGui.ResetOnSpawn = false
-			killsGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-			local killsFrame = Instance.new("Frame")
-			killsFrame.Size = UDim2.new(0, 180, 0, 55)
-			killsFrame.Position = UDim2.new(0.5, -90, 0, 60)
-			killsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 139)
-			killsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			killsFrame.Active = true
-			killsFrame.Draggable = true
-			killsFrame.Parent = killsGui
-
-			local titleLabel = Instance.new("TextLabel")
-			titleLabel.Size = UDim2.new(1, 0, 0, 20)
-			titleLabel.Position = UDim2.new(0, 0, 0, 0)
-			titleLabel.BackgroundTransparency = 1
-			titleLabel.Text = "Project V1"
-			titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			titleLabel.Font = Enum.Font.SourceSansBold
-			titleLabel.TextScaled = true
-			titleLabel.Parent = killsFrame
-
-			local killsLabel = Instance.new("TextLabel")
-			killsLabel.Size = UDim2.new(1, 0, 0, 35)
-			killsLabel.Position = UDim2.new(0, 0, 0, 20)
-			killsLabel.BackgroundTransparency = 1
-			killsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			killsLabel.TextScaled = true
-			killsLabel.Font = Enum.Font.SourceSansBold
-			killsLabel.Parent = killsFrame
-
-			coroutine.wrap(function()
-				while killsGui and killsGui.Parent do
-					local kills = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Kills")
-					if kills then
-						killsLabel.Text = "Kills: " .. tostring(kills.Value)
-					else
-						killsLabel.Text = "Kills: 0"
-					end
-					task.wait(0.2)
-				end
-			end)()
-		else
-			killsGui.Enabled = true
-		end
-	else
-		if killsGui then
-			killsGui.Enabled = false
-		end
-	end
+local switchAll = tabPlayer:AddSwitch("Nan Size + Egg + Punch", function(bool)
+    autoAllEnabled = bool
 end)
 
-showKillsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+task.spawn(function()
+    while true do
+        if autoAllEnabled then
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.changeSpeedSizeRemote:InvokeServer("changeSize", sizeToSet)
+            end)
+
+            local punch = LocalPlayer.Backpack:FindFirstChild("Punch")
+            if punch then
+                punch.Parent = LocalPlayer.Character
+            end
+
+            local egg = LocalPlayer.Backpack:FindFirstChild("Protein Egg")
+            if egg then
+                egg.Parent = LocalPlayer.Character
+            end
+        end
+        task.wait(0.1)
+    end
+end)
