@@ -6,6 +6,19 @@ local window = library:AddWindow("Silence | Boost Gifter", {
     can_resize = false,
 })
 
+local function setFontRecursive(guiObject, font)
+    for _, obj in pairs(guiObject:GetDescendants()) do
+        if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+            obj.Font = font
+        end
+    end
+end
+
+spawn(function()
+    repeat wait() until window.gui
+    setFontRecursive(window.gui, Enum.Font.FredokaOne)
+end)
+
 local tabPlayer = window:AddTab("Player")
 
 local LocalPlayer = game.Players.LocalPlayer
