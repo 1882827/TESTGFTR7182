@@ -21,6 +21,8 @@ end)
 
 local tabPlayer = window:AddTab("Player")
 
+tabPlayer:AddLabel("Farming").TextSize = 25
+
 local LocalPlayer = game.Players.LocalPlayer
 local sizeToSet = 0/0
 local megaSwitchEnabled = false
